@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="step"
+                  type="com.ctapk.bakingapp.model.Step"/>
+        <variable name="callback"
+                  type="com.ctapk.bakingapp.ui.StepClickCallback"/>
+    </data>
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/light_background"
+        android:layout_marginStart="@dimen/horizontal_margin"
+        android:layout_marginEnd="@dimen/horizontal_margin"
+
+        android:minHeight="@dimen/min_height"
+        android:onClick="@{() ->  callback.onClick(step)}"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        app:cardUseCompatPadding="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/padding"
+                android:text="@{step.shortDescription}"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/padding"
+                android:text="@{step.description}"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/padding"
+                android:text="@{step.videoURL}"/>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</layout>
