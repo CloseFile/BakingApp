@@ -1,4 +1,4 @@
-package com.ctapk.bakingapp.db.entity;
+package com.ctapk.bakingapp.db.models;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
@@ -6,20 +6,19 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
-import com.ctapk.bakingapp.model.Ingredients;
 import com.google.gson.annotations.SerializedName;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(
         foreignKeys = @ForeignKey(
-                entity = RecipeEntity.class,
+                entity = Recipe.class,
                 parentColumns = "name",
                 childColumns = "recipe_name",
                 onDelete = CASCADE),
         indices = {@Index(value = "recipe_name")},
         tableName = "ingredients")
-public class IngredientEntity implements Ingredients {
+public class Ingredient {
 
     @PrimaryKey(autoGenerate = true)
     private final int id;
@@ -32,7 +31,7 @@ public class IngredientEntity implements Ingredients {
     @ColumnInfo(name = "recipe_name")
     private String recipeName;
 
-    public IngredientEntity(int id, Double quantity, String measure, String ingredient, String recipeName) {
+    public Ingredient(int id, Double quantity, String measure, String ingredient, String recipeName) {
         this.id = id;
         this.quantity = quantity;
         this.measure = measure;
@@ -43,23 +42,23 @@ public class IngredientEntity implements Ingredients {
     public void setRecipeName(String recipeName) {
         this.recipeName = recipeName;
     }
-    @Override
+
     public String getRecipeName() {
         return recipeName;
     }
-    @Override
+
     public int getId() {
         return id;
     }
-    @Override
+
     public Double getQuantity() {
         return quantity;
     }
-    @Override
+
     public String getMeasure() {
         return measure;
     }
-    @Override
+
     public String getIngredient() {
         return ingredient;
     }

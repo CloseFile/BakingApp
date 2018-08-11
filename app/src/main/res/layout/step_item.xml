@@ -3,7 +3,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable name="step"
-                  type="com.ctapk.bakingapp.model.Step"/>
+                  type="com.ctapk.bakingapp.db.models.InstructionStep"/>
         <variable name="callback"
                   type="com.ctapk.bakingapp.ui.StepClickCallback"/>
     </data>

@@ -1,6 +1,9 @@
 package com.ctapk.bakingapp;
 
 import android.app.Application;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.ctapk.bakingapp.api.QueryApi;
 import com.ctapk.bakingapp.db.AppDB;
@@ -29,4 +32,12 @@ public class BakingApp extends Application {
     public static QueryApi getApi() { return mQueryApi; }
     public AppDB getDatabase() { return AppDB.getInstance(this, mAppExecutors);}
     public DataRepository getRepository() { return DataRepository.getInstance(getDatabase());}
+
+    public boolean deviceIsOnline() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) this.getApplicationContext()
+                        .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnectedOrConnecting();
+    }
 }

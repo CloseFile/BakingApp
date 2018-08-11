@@ -2,6 +2,7 @@ package com.ctapk.bakingapp.db;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.persistence.db.SupportSQLiteDatabase;
@@ -14,11 +15,13 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.ctapk.bakingapp.AppExecutors;
+import com.ctapk.bakingapp.db.dao.IngredientsDao;
+import com.ctapk.bakingapp.db.dao.InstructionStepsDao;
 import com.ctapk.bakingapp.db.dao.RecipesDao;
-import com.ctapk.bakingapp.db.dao.StepsDao;
-import com.ctapk.bakingapp.db.entity.RecipeEntity;
-import com.ctapk.bakingapp.db.entity.StepEntity;
-import com.ctapk.bakingapp.utils.DataGenerator;
+
+import com.ctapk.bakingapp.db.models.Ingredient;
+import com.ctapk.bakingapp.db.models.InstructionStep;
+import com.ctapk.bakingapp.db.models.Recipe;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -26,13 +29,18 @@ import retrofit2.Response;
 import com.ctapk.bakingapp.BakingApp;
 
 // @TypeConverters(ListConverter.class)
-@Database(entities = {RecipeEntity.class, StepEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {Recipe.class, InstructionStep.class, Ingredient.class}, version = 1, exportSchema = false)
 public abstract class AppDB extends RoomDatabase {
     private static AppDB sInstance;
     @VisibleForTesting
     public static final String DATABASE_NAME = "baking-app";
+
     public abstract RecipesDao recipesDao();
-    public abstract StepsDao stepsDao();
+
+    public abstract InstructionStepsDao stepsDao();
+
+    public abstract IngredientsDao ingredientsDao();
+
     private final MutableLiveData<Boolean> isDatabaseCreated = new MutableLiveData<>();
 
     public static AppDB getInstance(final Context context, final AppExecutors executors) {
@@ -48,6 +56,7 @@ public abstract class AppDB extends RoomDatabase {
         }
         return sInstance;
     }
+
     /* Build the database. {@link Builder#build()} only sets up the database configuration and
      * creates a new instance of the database.
      * The SQLite database is only created when it's accessed for the first time.
@@ -60,15 +69,17 @@ public abstract class AppDB extends RoomDatabase {
                     @Override
                     public void onCreate(@NonNull SupportSQLiteDatabase db) {
                         super.onCreate(db);
-                        ArrayList<RecipeEntity> recipes = new ArrayList<RecipeEntity>();
+                        ArrayList<Recipe> recipes = new ArrayList<>();
 
-                        BakingApp.getApi().getData().enqueue(new retrofit2.Callback<List<RecipeEntity>>() {
+                        BakingApp.getApi().getData().enqueue(new retrofit2.Callback<List<Recipe>>() {
                             @Override
-                            public void onResponse(Call<List<RecipeEntity>> call, Response<List<RecipeEntity>> response) {
+                            public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
                                 recipes.addAll(response.body());
+
                             }
+
                             @Override
-                            public void onFailure(Call<List<RecipeEntity>> call, Throwable t) {
+                            public void onFailure(Call<List<Recipe>> call, Throwable t) {
                                 //Проверка на ошибку
                                 Log.d("TAG", "Error" + t.toString());
                             }
@@ -76,21 +87,19 @@ public abstract class AppDB extends RoomDatabase {
                         executors.diskIO().execute(() -> {
                             // Add a delay to simulate a long-running operation
                             Log.d("TAG", " CreateDB");
-                            addDelay();
-                            Log.d("TAG", "addDelay()");
-
 
                             // Generate the data for pre-population
                             AppDB database = AppDB.getInstance(appContext, executors);
-//                            recipes = DataGenerator.generateRecipes();
-                            List<StepEntity> steps = DataGenerator.generateStepsForRecipes(recipes);
-                            insertData(database, recipes, steps);
+
+                            insertData(database, recipes);
+
                             // notify that the database was created and it's ready to be used
                             database.setDatabaseCreated();
                         });
                     }
                 }).build();
     }
+
     /**
      * Check whether the database already exists and expose it via {@link #getDatabaseCreated()}
      */
@@ -99,24 +108,35 @@ public abstract class AppDB extends RoomDatabase {
             setDatabaseCreated();
         }
     }
-    private void setDatabaseCreated(){ isDatabaseCreated.postValue(true);}
 
-    private static void insertData(final AppDB database, final List<RecipeEntity> recipes,
-                                   final List<StepEntity> steps) {
+    private void setDatabaseCreated() {
+        isDatabaseCreated.postValue(true);
+    }
+
+    private static void insertData(final AppDB database, final List<Recipe> recipes) {
+
         // Constant for logging
         String TAG = "called AppDB ";
         Log.d(TAG, "insertData");
 
         database.runInTransaction(() -> {
-            database.recipesDao().insertAll(recipes);
-            database.stepsDao().insertAll(steps);
+            database.recipesDao().insertRecipes(recipes);
+            for (Recipe recipe : recipes) {
+                List<Ingredient> ingredients = recipe.getIngredients();
+                for (Ingredient ingredient : ingredients) {
+                    ingredient.setRecipeName(recipe.getName());
+                }
+                database.ingredientsDao().insertIngredients(ingredients);
+                List<InstructionStep> instructionSteps = recipe.getSteps();
+                for (InstructionStep step : instructionSteps) {
+                    step.setRecipeName(recipe.getName());
+                }
+                database.stepsDao().insertInstructionSteps(instructionSteps);
+            }
         });
     }
-    private static void addDelay() {
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException ignored) {
-        }
+
+    public LiveData<Boolean> getDatabaseCreated() {
+        return  isDatabaseCreated;
     }
-    public LiveData<Boolean> getDatabaseCreated() { return isDatabaseCreated; }
 }

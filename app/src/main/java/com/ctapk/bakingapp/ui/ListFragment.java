@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ctapk.bakingapp.db.entity.RecipeEntity;
+import com.ctapk.bakingapp.db.models.Recipe;
 import com.ctapk.bakingapp.viewmodel.ListViewModel;
 
 import com.ctapk.bakingapp.R;
@@ -45,9 +45,9 @@ public class ListFragment extends Fragment {
     }
     private void subscribeUi(ListViewModel viewModel) {
         // Update the list when the data changes
-        viewModel.getRecipes().observe(this, new Observer<List<RecipeEntity>>() {
+        viewModel.getRecipes().observe(this, new Observer<List<Recipe>>() {
             @Override
-            public void onChanged(@Nullable List<RecipeEntity> recipes) {
+            public void onChanged(@Nullable List<Recipe> recipes) {
                 if (recipes != null) {
                     mBinding.setIsLoading(false);
                     mRecipeAdapter.setRecipeList(recipes);
@@ -59,9 +59,12 @@ public class ListFragment extends Fragment {
             }
         });
     }
-    private final RecipeClickCallback recipeClickCallback = recipe -> {
-        if (ListFragment.this.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-            ((MainActivity) ListFragment.this.getActivity()).show(recipe);
+    private final RecipeClickCallback recipeClickCallback = new RecipeClickCallback() {
+        @Override
+        public void onClick(Recipe recipe) {
+            if (ListFragment.this.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                ((MainActivity) ListFragment.this.getActivity()).show(recipe);
+            }
         }
     };
 

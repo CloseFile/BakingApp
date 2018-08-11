@@ -3,7 +3,7 @@
     <data>
         <variable
             name="step"
-            type="com.ctapk.bakingapp.model.Step" />
+            type="com.ctapk.bakingapp.db.models.InstructionStep" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"

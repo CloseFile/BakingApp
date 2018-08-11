@@ -9,7 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.ctapk.bakingapp.model.Recipe;
+import com.ctapk.bakingapp.db.models.Recipe;
 
 import com.ctapk.bakingapp.R;
 import com.ctapk.bakingapp.databinding.ListItemBinding;

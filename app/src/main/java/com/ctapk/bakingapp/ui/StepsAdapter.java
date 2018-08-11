@@ -9,19 +9,19 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.ctapk.bakingapp.model.Step;
+import com.ctapk.bakingapp.db.models.InstructionStep;
 
 import com.ctapk.bakingapp.R;
 import com.ctapk.bakingapp.databinding.StepItemBinding;
 
 public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHolder> {
-    private List<? extends Step> steps;
+    private List<? extends InstructionStep> steps;
     @Nullable
     private final StepClickCallback stepClickCallback;
     public StepsAdapter(@Nullable StepClickCallback clickCallback) {
         stepClickCallback = clickCallback;
     }
-    public void setStepList(final List<? extends Step> stepList) {
+    public void setStepList(final List<? extends InstructionStep> stepList) {
         if (steps == null) {
             steps = stepList;
             notifyItemRangeInserted(0, stepList.size());
@@ -33,16 +33,16 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
                 public int getNewListSize() { return stepList.size(); }
                 @Override
                 public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                    Step newStep = stepList.get(newItemPosition);
-                    Step oldStep = steps.get(oldItemPosition);
-                    return oldStep.getId() == newStep.getId();
+                    InstructionStep newStep = stepList.get(newItemPosition);
+                    InstructionStep oldStep = steps.get(oldItemPosition);
+                    return oldStep.getDbId() == newStep.getDbId();
                 }
                 @Override
                 public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                    Step newStep = stepList.get(newItemPosition);
-                    Step oldStep = steps.get(oldItemPosition);
-                    return oldStep.getId() == newStep.getId()
-                            && oldStep.getRecipeId() == newStep.getRecipeId()
+                    InstructionStep newStep = stepList.get(newItemPosition);
+                    InstructionStep oldStep = steps.get(oldItemPosition);
+                    return oldStep.getDbId() == newStep.getDbId()
+                            && oldStep.getRecipeName() == newStep.getRecipeName()
                             && Objects.equals(oldStep.getShortDescription(), newStep.getShortDescription())
                             && Objects.equals(oldStep.getDescription(), newStep.getDescription())
                             && Objects.equals(oldStep.getVideoURL(), newStep.getVideoURL());

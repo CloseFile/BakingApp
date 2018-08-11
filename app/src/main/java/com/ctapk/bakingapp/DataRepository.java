@@ -1,30 +1,36 @@
 package com.ctapk.bakingapp;
 
 import java.util.List;
+
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.Observer;
+import android.support.annotation.Nullable;
 
 import com.ctapk.bakingapp.db.AppDB;
-import com.ctapk.bakingapp.db.entity.RecipeEntity;
-import com.ctapk.bakingapp.db.entity.StepEntity;
+
+import com.ctapk.bakingapp.db.models.Ingredient;
+import com.ctapk.bakingapp.db.models.InstructionStep;
+import com.ctapk.bakingapp.db.models.Recipe;
 
 /* Repository handling the work with recipes and steps. */
 public class DataRepository {
     private static DataRepository sInstance;
     private final AppDB appDB;
-    private final MediatorLiveData<List<RecipeEntity>> observableRecipes;
+    private final MediatorLiveData<List<Recipe>> observableRecipes;
 
     private DataRepository(final AppDB database) {
         appDB = database;
         observableRecipes = new MediatorLiveData<>();
 
-        observableRecipes.addSource(appDB.recipesDao().loadAll(),
+        observableRecipes.addSource(appDB.recipesDao().getRecipes(),
                 recipes -> {
                     if (appDB.getDatabaseCreated().getValue() != null) {
                         observableRecipes.postValue(recipes);
                     }
                 });
     }
+
     public static DataRepository getInstance(final AppDB database) {
         if (sInstance == null) {
             synchronized (DataRepository.class) {
@@ -35,26 +41,43 @@ public class DataRepository {
         }
         return sInstance;
     }
+
     /* Get the list of recipes from the database and get notified when the data changes. */
-    public LiveData<List<RecipeEntity>> getRecipes() { return observableRecipes; }
-    public LiveData<RecipeEntity> loadRecipe(final int recipeId) {
-        return appDB.recipesDao().loadById(recipeId);
-    }
-    public LiveData<List<StepEntity>> loadSteps(final int recipeId) {
-        return appDB.stepsDao().loadByParentId(recipeId);
-    }
-    public MediatorLiveData<List<RecipeEntity>> getObservableRecipes() {
+    public LiveData<List<Recipe>> getRecipes() {
         return observableRecipes;
     }
-    public StepEntity loadEntity(final int recipeId, final int stepId) {
-        StepEntity step = new StepEntity();
-        AppExecutors.getInstance().diskIO().execute(() -> {
-            StepEntity entity = new StepEntity();
-            entity = appDB.stepsDao().getByRecipeId(recipeId, stepId);
-        });
-        return step;
+
+    public LiveData<Recipe> loadRecipe(final String recipeName) {
+        return appDB.recipesDao().loadByName(recipeName);
     }
-    public LiveData<StepEntity> loadStep(final int recipeId, final int stepId) {
-        return appDB.stepsDao().loadByRecipeId(recipeId,stepId);
+
+//    public LiveData<Recipe> loadRecipe(final String recipeName) {
+//        return appDB.recipesDao().loadByName(recipeName);
+//    }
+
+    //    public LiveData<List<InstructionStep>> loadSteps(final int recipeId) {
+//        return appDB.stepsDao().loadByParentId(recipeId);
+//    }
+    public LiveData<List<InstructionStep>> loadSteps(String recipeName) {
+        return appDB.stepsDao().getInstructionSteps(recipeName);
     }
+    public LiveData<List<Ingredient>> getIngredients(String recipeName) {
+        return appDB.ingredientsDao().getIngredients(recipeName);
+    }
+//    public MediatorLiveData<List<Recipe>> getObservableRecipes() {
+//        return observableRecipes;
+//    }
+
+//    public InstructionStep loadEntity(final int recipeId, final int stepId) {
+//        InstructionStep step = new InstructionStep();
+//        AppExecutors.getInstance().diskIO().execute(() -> {
+//            InstructionStep entity = new InstructionStep();
+//            entity = appDB.stepsDao().getByRecipeId(recipeId, stepId);
+//        });
+//        return step;
+//    }
+
+//    public LiveData<InstructionStep> loadStep(String recipeName, final int stepId) {
+//        return appDB.stepsDao().getInstructionStep(recipeName, stepId);
+//    }
 }

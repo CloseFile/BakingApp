@@ -11,8 +11,7 @@ import android.view.ViewGroup;
 
 import com.ctapk.bakingapp.R;
 import com.ctapk.bakingapp.db.AppDB;
-import com.ctapk.bakingapp.db.entity.StepEntity;
-import com.ctapk.bakingapp.model.Step;
+import com.ctapk.bakingapp.db.models.InstructionStep;
 
 import com.ctapk.bakingapp.databinding.MakeFragmentBinding;
 
@@ -20,6 +19,8 @@ public class MakeFragment extends Fragment {
     // Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String KEY_ID = "primary-id";
+    private static final String KEY_RECIPE_NAME = "recipe-name";
+
     private static final String KEY_RECIPE_ID = "recipe-id";
     private static final String KEY_STEP_ID = "step-id";
     private static final String KEY_SHORT = "shot";
@@ -34,12 +35,12 @@ public class MakeFragment extends Fragment {
         // Required empty public constructor
     }
     /* Creates make fragment for specific step */
-    public static MakeFragment forStep(Step step) {
+    public static MakeFragment forStep(InstructionStep step) {
         MakeFragment fragment = new MakeFragment();
         Bundle args = new Bundle();
-        args.putInt(KEY_ID, step.getId());
-        args.putInt(KEY_RECIPE_ID, step.getRecipeId());
-        args.putInt(KEY_STEP_ID, step.getStepId());
+        args.putInt(KEY_ID, step.getDbId());//getId());
+        args.putString(KEY_RECIPE_NAME, step.getRecipeName());//getRecipeId());
+        args.putInt(KEY_STEP_ID, step.getStepNo());//getStepId());
         args.putString(KEY_SHORT, step.getShortDescription());
         args.putString(KEY_DESCRIPTION, step.getDescription());
         args.putString(KEY_VIDEO_URL, step.getVideoURL());
@@ -54,16 +55,16 @@ public class MakeFragment extends Fragment {
         // Inflate this data binding layout
         final MakeFragmentBinding binding = DataBindingUtil.inflate(inflater,
                 R.layout.make_fragment, container, false);
-        StepEntity entity = new StepEntity();
-        entity.setId(getArguments().getInt(KEY_ID));
-        entity.setRecipeId(getArguments().getInt(KEY_RECIPE_ID));
-        entity.setStepId(getArguments().getInt(KEY_STEP_ID));
-        entity.setShortDescription(getArguments().getString(KEY_SHORT));
-        entity.setDescription(getArguments().getString(KEY_DESCRIPTION));
-        entity.setVideoURL(getArguments().getString(KEY_VIDEO_URL));
-        entity.setThumbnailURL(getArguments().getString(KEY_THUMBNAIL_URL));
-        binding.setStep(entity);
-        binding.hasPendingBindings();
+//        InstructionStep entity = new InstructionStep();
+//        entity.setId(getArguments().getInt(KEY_ID));
+//        entity.setRecipeId(getArguments().getInt(KEY_RECIPE_ID));
+//        entity.setStepId(getArguments().getInt(KEY_STEP_ID));
+//        entity.setShortDescription(getArguments().getString(KEY_SHORT));
+//        entity.setDescription(getArguments().getString(KEY_DESCRIPTION));
+//        entity.setVideoURL(getArguments().getString(KEY_VIDEO_URL));
+//        entity.setThumbnailURL(getArguments().getString(KEY_THUMBNAIL_URL));
+//        binding.setStep(entity);
+//        binding.hasPendingBindings();
         return binding.getRoot();
     }
 }

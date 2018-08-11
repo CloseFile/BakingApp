@@ -4,8 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.ctapk.bakingapp.R;
-import com.ctapk.bakingapp.model.Recipe;
-import com.ctapk.bakingapp.model.Step;
+import com.ctapk.bakingapp.db.models.InstructionStep;
+import com.ctapk.bakingapp.db.models.Recipe;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public void show(Recipe recipe) {
-        StepsFragment stepsFragment = StepsFragment.forRecipe(recipe.getId());
+        StepsFragment stepsFragment = StepsFragment.forRecipe(recipe.getName());
         getSupportFragmentManager()
                 .beginTransaction()
                 .addToBackStack("recipe")
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
     /** Shows the recipe detail fragment */
-    public void showStep(Step step) {
+    public void showStep(InstructionStep step) {
         MakeFragment makeFragment = MakeFragment.forStep(step);
         getSupportFragmentManager()
                 .beginTransaction()

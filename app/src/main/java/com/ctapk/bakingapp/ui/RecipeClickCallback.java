@@ -1,6 +1,6 @@
 package com.ctapk.bakingapp.ui;
 
-import com.ctapk.bakingapp.model.Recipe;
+import com.ctapk.bakingapp.db.models.Recipe;
 
 
 public interface RecipeClickCallback {
